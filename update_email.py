@@ -14,7 +14,7 @@ if os.path.isfile("settings.conf"):
         if email_password == "":
             print("No Password Stored check settings.conf")
         else:
-            f = open("currentip.txt","r")
+            f = open("ips/currentip.txt","r")
             Ip_Address = f.read()
             sent_from = email_username
             sent_to = email_username
@@ -48,4 +48,3 @@ else:
         print ("config file created ")
     else:
         print ("Exiting program")
-
