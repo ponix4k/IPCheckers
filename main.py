@@ -58,6 +58,8 @@ def Main():
         Same_IP == True
         #print ("IP is the same")
         print ('No Changes')
+        l1 = open('log.txt','a+')
+        l1.write(sttime+' <INFO> -'+' IP is unchanged'+'\n')
     else:
         Same_IP == False
         Print ("IP has changed!")
