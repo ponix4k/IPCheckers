@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import sys
+import smtplib
 from datetime import datetime
 
 sttime = datetime.now().strftime('%Y%m%d_%H:%M:%S - ')
@@ -42,7 +43,53 @@ def Get_Current_IP():
     f2 = open(Current_IP,'w')
     f2.write (CIP)
     f2.close
-#    print('Current IP is: '+ CIP)
+
+def Email():
+    if os.path.isfile("settings.conf"):
+        email_address_r = open("settings.conf","r")
+        email_username = email_address_r.readlines()[0]
+        if email_username == "":
+            print("No Email Stored check your settings.conf file")
+        else:
+            password_r = open("settings.conf","r")
+            email_password = password_r.readlines()[1]
+            if email_password == "":
+                print("No Password has been stored check your settings.conf file")
+            else:
+                f = open("ips/currentip.txt","r")
+                IP_Address = f.read()
+                sent_from = email_username
+                sent_to = email_username
+                subject = "IP Address has changed"
+                body = "Your new IP address is : " + str(IP_Address)
+                email_text = """\
+                        From: %s
+                        To: %s
+                        Subject: %s
+                        %s
+                        """ % (sent_from, ", ".join(sent_to), subject, body)
+                try:
+                            server = smtplib.SMTP_SSL('smtp.gmail.com',465)
+                            server.ehlo()
+                            server.login(email_username, email_password)
+                            server.sendmail(sent_from,sent_to,email_text)
+                            server.close()
+                            print ('Email Has Been Sent')
+                except:
+                            print ('Something went wrong...')
+    else:
+        print ("Error no config file found")
+        create_config = input ("Do you wish to Create a config file (Y or N): ")
+        if create_config == "Y":
+            f = open("settings.conf","a+")
+            email_username = input("enter username: ")
+            email_password = input("Enter Password: ")
+            f.write(str(email_username)+"\n")
+            f.write(str(email_password))
+            f.close()
+            print ("config file created ")
+        else:
+            print ("Exiting program")
 
 def Main():
     Last_IP_Check()
@@ -62,7 +109,7 @@ def Main():
         l1.write(sttime+' <INFO> -'+' IP is unchanged'+'\n')
     else:
         Same_IP == False
-        Print ("IP has changed!")
+        print ("IP has changed!")
         l1 = open('log.txt','a+')
         print ('New IP Detected')
         l1.write(sttime+' <INFO> -'+' New IP Detected '+'\n')
@@ -72,7 +119,8 @@ def Main():
         print('IP Address Updated')
         l1.close()
         print ('Emailing new IP')
-#        os.system('python3 update_email.py')
+        Email()
+#       Email os.system('python3 update_email.py')
 
 Main()
 
