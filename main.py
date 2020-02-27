@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 import smtplib 
 import os,sys
+log_path = "log.txt"
+IP_log = "ip.txt"
+
 class notification():
     message = ""
 
-    def __init__(self):
-       self.message = "message"
+    def __init__(self, message):
+       self.message = message
 
     def send_message(self):
         print(self.message)
@@ -87,14 +90,45 @@ def load_settings(path):
     return settings
 
 def get_IP_address():
-    return "127.0.0.1"
+    return os.popen("curl ifconfig.me").read()
+
+def read_IP_log():
+    with open(IP_log) as IPlog:
+        logged_IP = IPlog.read()
+    IPlog.close()
+    return logged_IP
+
+def get_timestamp():
+    return "2020/02/27" # make this a real date obviously
+
+def log_IP_change(old_IP, new_IP):
+    with open(log_path, "a+") as log:
+        log.write("[{}] <INFO> IP Address Changed! Updating\n".format(get_timestamp()))
+        log.write("[{}] <INFO> New Address: {}\n\t\t Old Address:{}".format(get_timestamp(), new_IP, old_IP))
+        with open(IP_log, "w") as iplog:
+            iplog.write(new_IP)            
+        iplog.close()
+    log.close()
+
+
+
+def get_current_IP_address():
+    current_IP = get_IP_address()
+    if os.path.isfile(IP_log):
+        logged_IP = read_IP_log()
+        if not (logged_IP == current_IP): #if they don't match IP has changed - do stuff
+            log_IP_change(logged_IP, current_IP)
+            return current_IP
+    else:
+        log_IP_change("0.0.0.0",current_IP)
+        return current_IP
     
 def main():
     settings = load_settings("settings.conf")
-    printnotif= notification()
-    email= email_notification("your IP is {}".format(get_IP_address()), settings)
+    printnotif= notification("your IP is {}".format(get_current_IP_address()))
+    #email= email_notification("your IP is {}".format(get_current_IP_address()), settings)
     send(printnotif)
-    send(email)
+    #send(email)
 
 
 if __name__ == "__main__":
