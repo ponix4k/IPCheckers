@@ -1,3 +1,6 @@
 ips/
-settings.conf
+settings.xml
 log.txt
+test1.py
+test2.py
+settings_load.py
