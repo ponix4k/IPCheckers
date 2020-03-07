@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import smtplib
 import os,sys
-import xml.dom.minidom
+import xml.etree.ElementTree as ET
 from datetime import datetime
 
 timestamp = datetime.now().strftime('%Y%m%d_%H:%M:%S - ')
@@ -65,26 +65,28 @@ def create_settings_file(path, settings):
     settings_file.close()
     return settings
 
-def load_settings(path):
-    settings = {}
-    if os.path.isfile(path):
-        print("file found")
-        with open(path, 'r') as settings_file:
-            settings["contact_method"] = settings_file.readlines()[0].lower()
-            if (settings["contact_method"] == "email"):
-                settings["email_user"] = settings_file.readlines()[1]
-                if (check_setting_is_empty(settings["email_user"])):
-                    print("no email found in config file")
-                settings["email_password"] = settings_file.readlines()[2]
-                if (check_setting_is_empty(settings["email_password"])):
-                    print("no password found in config file")
-            else:
-                print("no contact method selected")
-            print(settings)
-            settings_file.close()
+def load_settings():
+    if os.path.isfile('test_settings.xml'):
+        print ("Settings File Found")
+        tree = ET.parse('test_settings.xml')
+        root = tree.getroot()
+        for settings in root.findall('contact_method'):
+                att = settings.attrib
+                #print(att)
+                name=att.get('name')
+                enabled =att.get('is_enabled')
+                #print(enabled)
+                if enabled == 'True':
+                    print(name,': ',enabled)
+                    username=settings.find('username').text
+                    password=settings.find('password').text
+                    email_server=settings.find('email_server').text
+                    email_port=settings.find('email_port').text
+                    subject=settings.find('subject').text
+                    print ('#################\n',username,':',password,'\n',email_server,':',email_port,'\n',subject,'\n#################')
     else:
-        create_settings_file(path, settings)
-    return settings
+        print ("No settings file could be located")
+load_settings()
 
 def get_IP_address():
     return os.popen("curl ifconfig.me").read()
@@ -122,14 +124,13 @@ def get_current_IP_address():
         print (current_IP)
 
 def main():
-    currentip = get_current_IP_address()
-    print(currentip)
-    settings = load_settings("settings.conf")
-    print (settings)
-    printnotif = notification("your IP is: " + str(currentip))
-    print (printnotif)
+    settings = load_settings()
+    #currentip = get_current_IP_address()
+    #print(currentip)
+    #printnotif = notification("your IP is: " + str(currentip))
+    #print (printnotif)
     #email= email_notification("your IP is {}".format(get_current_IP_address()), settings)
-    send(printnotif)
+    #send(printnotif)
     #send(email)
 
 
