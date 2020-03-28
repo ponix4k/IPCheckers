@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import smtplib
+import smtplib,ssl
 import os,sys
 import json
 from datetime import datetime
@@ -21,7 +21,7 @@ class notification():
 class email_notification(notification):
     
     def __init__ (self, ip, settings):
-        print(settings)
+        #print(settings)
         self.email_user = settings["username"]
         self.email_password = settings["password"]
         self.message = ["message"]
@@ -34,14 +34,18 @@ class email_notification(notification):
 
     def send_message(self):
         try:
-            server = smtplib.SMTP_SSL(self.email_server, self.email_port)
+            server = smtplib(settings.email_server, settings.email_port)
+            print(server)
             server.ehlo()
-            server.login(self.email_user, self.email_password)
-            server.sendmail(self.email_user, self.to, self.message)
+            print("ehlo")
+            server.login(settings.email_user, settings.email_password)
+            print(server.login)
+            server.sendmail(settings.email_user, settings.to, settings.message)
+            print (server.sendmail)
             server.close()
             print("Email Has Been Sent")
         except:
-           print("shit went wrong")
+            print("shit went wrong")
 
 def send(notif):
     notif.send_message()
@@ -50,7 +54,7 @@ def write_default_settings():
     settings = {}
     settings['email'] = {
             "name": "email",
-            "id": "1",
+            "id": "x",
             "is_enabled": True,
             "username": "email@email.com",
             "password": "hunter2",
@@ -59,18 +63,7 @@ def write_default_settings():
             "email_server": "smtp.gmail.com",
             "email_port": "465" 
     }
-    settings['matrix'] = {
-            "name": "matrix",
-            "id": "2",
-            "is_enabled": False,
-            "username": "email@email.com",
-            "password": "hunter2",
-            "subject": "IP HAS CHANGED",
-            "message":"Your new IP address is: ",
-            "email_server": "smtp.gmail.com",
-            "email_port": "465" }
- 
-
+   
     s=json.dumps(settings)
     with open (config,'w') as f:
         f.write(s)
@@ -106,7 +99,7 @@ def write_settings():
     
     settings['email'] = {
             "name": name,
-            "id": "1",
+            "id": "x",
             "is_enabled": enabled,
             "username": username,
             "password": passwd,
@@ -120,14 +113,16 @@ def write_settings():
         file.write(setting_file)
   
 def get_IP_address():
-    return os.popen("curl ifconfig.me").read()
-
+    current_IP = os.popen("curl ifconfig.me").read()
+    #print("Current IP is: ",current_IP)
+    return current_IP
+    
 def read_IP_log():
     with open(IP_log) as IPlog:
-        logged_IP = IPlog.read()
-        print ("Logged IP is: " +logged_IP)
-    IPlog.close()
-    return logged_IP
+        last_IP = IPlog.read()
+        #print ("Logged IP is: " +logged_IP)
+        return last_IP
+        IPLog.close()
 
 def get_timestamp():
     return "2020/02/27" # make this a real date obviously
@@ -140,32 +135,26 @@ def log_IP_change(old_IP, new_IP):
             iplog.write(new_IP)
             iplog.close()
         log.close()
-
-def get_current_IP_address():
-    current_IP = get_IP_address()
-    if os.path.isfile(IP_log):
-        logged_IP = read_IP_log()
-        if (logged_IP == current_IP): #if they don't match IP has changed - do stuff
-            has_changed = False
-            return current_IP
-        else:
-           log_IP_change(logged_IP, current_IP)
-           print(logged_ip,current_ip)
-           has_changed = True
-    else:
-        log_IP_change("0.0.0.0",current_IP)
-        has_changed = True
-        return current_IP
         
 def main():
     has_changed = False
     settings = read_settings()
-    currentip = get_current_IP_address()
-    print(has_changed)
-    #printnotif = notification("your IP is: " + str(currentip))
-    #printnotif.send_message()
+    current_IP = get_IP_address()
+    last_IP = read_IP_log()
+    #print("Current ip is: ",current_IP)
+    #print("Last IP is: ",last_IP)
+    #print("has_changed: ",has_changed)
+    if current_IP != last_IP:
+        has_changed = True
+    else:
+        has_changed = False
+
+    print (has_changed)
+    printnotif = notification("your IP is: " + str(current_IP))
+    printnotif.send_message()
     if (has_changed):
-        email = email_notification(currentip,settings["email"])
+        email = email_notification(current_IP,settings["email"])
+        #print (email)
         send(email)
     
 if __name__ == "__main__":
