@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 smtplib
 ssl
+=======
+smtplib
+>>>>>>> parent of 80bd68a... synch files
