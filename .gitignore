@@ -1,5 +1,5 @@
 ips/
-settings.xml
+settings.json
 log.txt
 *.swp
 test_setings.*
