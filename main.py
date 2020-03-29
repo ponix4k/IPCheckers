@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-import smtplib
-import ssl
 import re
+import requests
 import os
 import sys
 import json
@@ -28,33 +27,61 @@ class notification():
         print(self.message)
 
 
+class telegram_notifcation(notification):
+    def __init__(self, settings):
+        self.token = settings["telegram"]["token"]
+        self.chat_id = settings["telegram"]["chat_id"]
+        self.base = "https://api.telegram.org/bot{}/".format(self.token)
+
+    def get_updates(self, offset=None):
+        url = self.base + "getUpdates?=100"
+        if offset:
+            url = url + "&offset={}".format(offset + 1)
+        r = requests.get(url)
+        return json.loads(r.content)
+
+    def send_message(self, msg):
+        url = self.base + \
+            "sendMessage?chat_id={}&text={}".format(self.chat_id, msg)
+        print(url)
+        if msg is not None:
+            requests.get(url)
+
+
+class sms_notification(notification):
+    print("sms test")
+
+# // Removed as the smtplib has been removed from the pip installer
+
+
 class email_notification(notification):
+    print("email test")
 
-    def __init__(self, ip, settings):
-        print(settings)
-        self.email_user = settings["username"]
-        self.email_password = settings["password"]
-        self.message = ["message"]
-        self.to = settings["username"]
-        self.subject = settings["subject"]
-        self.email_server = settings["email_server"]
-        self.email_port = settings["email_port"]
-        self.ip = ip
+#    def __init__(self, ip, settings):
+#        print(settings)
+#        self.email_user = settings["username"]
+#        self.email_password = settings["password"]
+#        self.message = ["message"]
+#        self.to = settings["username"]
+#        self.subject = settings["subject"]
+#        self.email_server = settings["email_server"]
+#        self.email_port = settings["email_port"]
+#        self.ip = ip
 
-    def send_message(self):
-        try:
-            server = smtplib(settings.email_server, settings.email_port)
-            print(server)
-            server.ehlo()
-            print("ehlo")
-            server.login(settings.email_user, settings.email_password)
-            print(server.login)
-            server.sendmail(settings.email_user, settings.to, settings.message)
-            print(server.sendmail)
-            server.close()
-            print("Email Has Been Sent")
-        except:
-            print("shit went wrong")
+#    def send_message(self):
+#        try:
+#            server = smtplib(settings.email_server, settings.email_port)
+#            print(server)
+#            server.ehlo()
+#            print("ehlo")
+#            server.login(settings.email_user, settings.email_password)
+#            print(server.login)
+#            server.sendmail(settings.email_user, settings.to, settings.message)
+#            print(server.sendmail)
+#            server.close()
+#            print("Email Has Been Sent")
+#        except:
+#            print("shit went wrong")
 
 
 def send(notif):
@@ -188,10 +215,22 @@ def log_IP_change(old_IP, new_IP):
         log.close()
 
 
+def get_notification_type(settings):
+    notif = None
+    if (settings["email"]["is_enabled"]):
+        notif = email_notification(settings)
+    elif (settings["sms"]["is_enabled"]):
+        notif = sms_notification(settings)
+    elif (settings["telegram"]["is_enabled"]):
+        notif = telegram_notifcation(settings)
+    return notif
+
+
 def main():
     has_changed = False
     create_logs()
     settings = read_settings()
+    notif = get_notification_type(settings)
     last_IP = read_iplog()
     current_IP = get_current_address()
     if current_IP == last_IP:
@@ -199,15 +238,7 @@ def main():
         print('not changed')
     else:
         has_changed = True
-        print('text message has been sent')
-
-    #printnotif = notification("your IP is: " + str(current_IP))
-    # printnotif.send_message()
-    # if (has_changed):
-
-        #email = email_notification(current_IP,settings["email"])
-        #print (email)
-        # send(email)
+        notif.send_message("New IP is: "+current_IP)
 
 
 if __name__ == "__main__":
