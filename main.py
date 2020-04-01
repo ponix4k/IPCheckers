@@ -11,7 +11,7 @@ config = 'settings.json'
 log_path = 'log.txt'
 IPPath = 'ips'
 IP_log = IPPath+'/last_ip.txt'
-Current_IP = IPPath+'/Current_ip.txt'
+Current_IP = IPPath+'/current_ip.txt'
 has_changed = True
 
 # Notifcations
