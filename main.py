@@ -48,42 +48,6 @@ class telegram_notifcation(notification):
             requests.get(url)
 
 
-class sms_notification(notification):
-    print("sms test")
-
-# // Removed as the smtplib has been removed from the pip installer
-
-
-class email_notification(notification):
-    print("email test")
-
-#    def __init__(self, ip, settings):
-#        print(settings)
-#        self.email_user = settings["username"]
-#        self.email_password = settings["password"]
-#        self.message = ["message"]
-#        self.to = settings["username"]
-#        self.subject = settings["subject"]
-#        self.email_server = settings["email_server"]
-#        self.email_port = settings["email_port"]
-#        self.ip = ip
-
-#    def send_message(self):
-#        try:
-#            server = smtplib(settings.email_server, settings.email_port)
-#            print(server)
-#            server.ehlo()
-#            print("ehlo")
-#            server.login(settings.email_user, settings.email_password)
-#            print(server.login)
-#            server.sendmail(settings.email_user, settings.to, settings.message)
-#            print(server.sendmail)
-#            server.close()
-#            print("Email Has Been Sent")
-#        except:
-#            print("shit went wrong")
-
-
 def send(notif):
     notif.send_message()
 
