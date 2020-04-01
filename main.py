@@ -56,15 +56,30 @@ def write_default_settings():
     settings = {}
     settings['email'] = {
         "name": "email",
-        "id": "x",
-        "is_enabled": True,
+        "id": "1",
+        "is_enabled": False,
         "username": "email@email.com",
         "password": "hunter2",
         "subject": "IP HAS CHANGED",
         "message": "Your new IP address is: ",
         "email_server": "smtp.gmail.com",
         "email_port": "465"
-    }
+    },
+    settings["sms"] = {
+        "name": "sms",
+        "id": "2",
+        "is_enabled": False,
+        "username": "email@email.com",
+        "token": "hunter2",
+        "message": "Your new IP address is: "  
+    },
+    settings["telegram"] = {
+        "name": "telegram",
+        "id": "3",
+        "is_enabled": True,
+        "token": "0000000:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "chat_id":"1234567890",
+        "message": "Your new IP address is: "}
 
     s = json.dumps(settings)
     with open(config, 'w') as f:
