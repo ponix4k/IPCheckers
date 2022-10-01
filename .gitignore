@@ -1,6 +1,3 @@
-ips/
-settings.json
-log.txt
-*.swp
+*.txt
+*.json
 test_setings.*
-newbranch.py
