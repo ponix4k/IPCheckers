@@ -1,4 +1,4 @@
-#  python3
+#!/usr/bin/env python3
 import re
 import requests
 import os
@@ -54,26 +54,7 @@ def send(notif):
 
 def write_default_settings():
     settings = {}
-    settings['email'] = { +'\n'
-        "name": "email",+'+\n'
-        "id": "1",'+\n'
-        "is_enabled": False,'+\n'
-        "username": "email@email.com",'+\n'
-        "password": "hunter2",'+\n'
-        "subject": "IP HAS CHANGED",'+\n'
-        "message": "Your new IP address is: ",'+\n'
-        "email_server": "smtp.gmail.com",'+\n'
-        "email_port": "465",'+\n'
-    },'+\n'
-    settings["sms"] = {'+\n'
-        "name": "sms",'+\n'
-        "id": "2",'+\n'
-        "is_enabled": False,'+\n'
-        "username": "email@email.com",'+\n'
-        "token": "hunter2",'+\n'
-        "message": "Your new IP address is:",'+\n'
-    },'+\n'
-    settings["telegram"] = {,'+\n'
+    settings["telegram"] = {'+\n'
         "name": "telegram",'+\n'
         "id": "3",'+\n'
         "is_enabled": True,'+\n'
